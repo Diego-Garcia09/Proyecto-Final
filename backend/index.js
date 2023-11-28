@@ -9,10 +9,14 @@ const https = require('https');
 const jwt = require('jsonwebtoken');
 const passport = require('./passport');
 const routerProyecto = require('./router/proyectos');
+const routerPersona = require('./router/personas');
+const routerDonadores = require('./router/donadores');
 const models = require('./models');
 app.use(cors());
 app.use(express.json());
 app.use('/proyectos', routerProyecto);
+app.use('/personas', routerPersona);
+app.use('/donadores', routerDonadores);
 
 app.get('/', (req, res) => {
     res.send('Hola mundo!!!');
@@ -22,11 +26,11 @@ app.get('/protected', passport.authenticate('jwt', { session: false }), (req, re
     res.json({ message: 'Access granted to protected route' });
 });
 
-async function encontrarUsuarioDB() {
+async function encontrarUsuarioDB(payload) {
     try {
         const usuarios = await models.Usuarios.findAll({
             where: {
-                email: 'a1168334@uabc.edu.mx'
+                email: payload.email
             }
         });
         return usuarios[0];
@@ -49,7 +53,7 @@ app.post('/login', (req, res) => {
             const payload = desencriptar(token);
 
             // Revisa en la BD si el usuario existe
-            const usuario = await encontrarUsuarioDB();
+            const usuario = await encontrarUsuarioDB(payload);
 
             // Verifica que el email del usuario sea igual del token de Google y genera un token nuevo
             if (payload.email == usuario.email) {
@@ -88,6 +92,7 @@ const generarToken = function (payload) {
         nombre: payload.name,
         email: payload.email,
         userId: payload.sub,
+        verificado: 'true',
     }
     const token = jwt.sign(userData, 'secret', { expiresIn: '1d' });
     return token;

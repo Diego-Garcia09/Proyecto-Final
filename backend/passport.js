@@ -6,8 +6,8 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = 'secret';
 passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
     console.log(jwt_payload);
-    if (jwt_payload.nombre == "Diego Andre Garcia Villegas") {
-        return done(null, jwt_payload.nombre);
+    if (jwt_payload.verificado == 'true') {
+        return done(null, jwt_payload.verificado);
     }
     else {
         return done(null, false);

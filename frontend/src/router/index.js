@@ -19,6 +19,16 @@ const routes = [
         name: 'Inicio',
         component: () => import(/* webpackChunkName: "home" */ '@/views/Inicio.vue'),
       },
+      {
+        path: '/donar',
+        name: 'Donar',
+        component: () => import(/* webpackChunkName: "home" */ '@/views/Donar.vue'),
+      },
+      {
+        path: '/personas',
+        name: 'Personas',
+        component: () => import(/* webpackChunkName: "home" */ '@/views/Personas.vue'),
+      },
     ],
   },
 ]

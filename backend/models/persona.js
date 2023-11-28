@@ -27,9 +27,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true
     },
-    imagen: {
+    email: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true
     }
   }, {
     sequelize,

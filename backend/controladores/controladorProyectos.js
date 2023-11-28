@@ -1,4 +1,4 @@
-const proyectos = require('../persistencia/proyectos');
+const proyectos = require('../servicios/proyectos');
 
 const getAll = async function(req, res) {
     let p = await proyectos.findAll();
