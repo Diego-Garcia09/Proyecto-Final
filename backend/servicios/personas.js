@@ -23,6 +23,34 @@ const findByEmail = async (correo) => {
     return personas;
 }
 
+const findByDatos = async (correo, ide) => {
+    personas = await models.Persona.findAll({
+        where: {
+            email: correo,
+            rfc: ide
+        }
+    });
+    return personas;
+}
+
+const findById = async (ide) => {
+    personas = await models.Persona.findAll({
+        where: {
+            id: ide,
+        }
+    });
+    return personas;
+}
+
+const findByNombre = async (name) => {
+    personas = await models.Persona.findAll({
+        where: {
+            nombre: name
+        }
+    });
+    return personas;
+}
+
 const findByPersona = async (name, correo, id) => {
     personas = await models.Persona.findAll({
         where: {
@@ -66,9 +94,44 @@ const actPersona = async (ide, personaActualizada) => {
     }
 }
 
+const deleteById = async (ide) => {
+    try{
+        const per = await models.Donadores.findAll({
+            where: {
+                personaId: ide
+            }
+        });
+        const proy = await models.Proyectos.findAll({
+            where: {
+                id: per[0].proyectoId
+            }
+        });
+        const cant = proy[0].donacion - per[0].donacion;
+        console.log(cant);
+        proy[0].donacion = cant;
+        await proy[0].save();
+        const proyecto = await models.Donadores.destroy({
+            where: {
+                personaId: ide
+            }
+        });
+        const persona = await models.Persona.destroy({
+            where: {
+                id: ide
+            }
+        });
+        return { success: true, persona, proyecto };
+    }catch(error){return { success: false, message: error };}
+    
+}
+
 exports.findAll = findAll;
 exports.findByRFC = findByRFC;
+exports.findById = findById;
+exports.findByNombre = findByNombre;
 exports.findByPersona = findByPersona;
+exports.findByDatos = findByDatos;
 exports.createPersona = createPersona;
 exports.findByEmail = findByEmail;
 exports.actPersona = actPersona;
+exports.deleteById = deleteById;

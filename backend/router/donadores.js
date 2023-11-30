@@ -5,6 +5,7 @@ const controladorDonadores = require('../controladores/controladorDonadores');
 router.get("/", controladorDonadores.getAll);
 router.get("/:id/persona", controladorDonadores.getByPersonaId);
 router.get("/:id/proyecto", controladorDonadores.getByProyectoId);
-router.post("/:idProyecto/:idPersona", controladorDonadores.createDonacion);
+router.put("/:proyectoId", controladorDonadores.updateDonacion);
+router.post("/", controladorDonadores.createDonacion);
 
 module.exports = router;

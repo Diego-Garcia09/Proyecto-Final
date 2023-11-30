@@ -8,5 +8,8 @@ const auth = passport.authenticate('jwt', { session: false });
 
 router.get("/", auth, controladorProyecto.getAll);
 router.get("/:id", controladorProyecto.getByRFC);
+router.put("/:id", controladorProyecto.updateProyecto);
+router.post("/", controladorProyecto.createProyecto);
+router.delete("/:id", controladorProyecto.deleteProyecto);
 
 module.exports = router;

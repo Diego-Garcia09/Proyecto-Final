@@ -48,9 +48,37 @@ const updatePersona = async function (req, res) {
     }
 }
 
+const getByNombre = async function(req, res) {
+    let p = await personas.findByNombre(req.params.nombre);
+    await res.json(p);
+    console.log(p);
+}
+
+const getNombreByDatos = async function(req, res) {
+    let p = await personas.findByDatos(req.params.email, req.params.rfc);
+    await res.json(p);
+    console.log(p);
+}
+
+const deletePersona = async function(req, res) {
+    let p = await personas.deleteById(req.params.id);
+    await res.json(p);
+    console.log(p);
+}
+
+const getById = async function(req, res) {
+    let p = await personas.findById(req.params.id);
+    await res.json(p);
+    console.log(p);
+}
+
 exports.getAll = getAll;
 exports.getByRFC = getByRFC;
 exports.getByEmail = getByEmail;
+exports.getByNombre = getByNombre;
 exports.getByPersona = getByPersona;
+exports.deletePersona = deletePersona;
 exports.crearPersona = crearPersona;
 exports.updatePersona = updatePersona;
+exports.getNombreByDatos = getNombreByDatos;
+exports.getById = getById;
