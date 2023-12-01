@@ -31,6 +31,5 @@ const drawer = ref(false);
 const group = ref(null);
 const route = useRoute();
 const token = route.query.token;
-console.log(token);
 </script>
   

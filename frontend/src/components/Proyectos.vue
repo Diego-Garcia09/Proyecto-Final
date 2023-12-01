@@ -41,9 +41,6 @@
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
-
-
-
                 <v-dialog v-model="dialogDelete" max-width="500px">
                     <v-card>
                         <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
@@ -55,10 +52,6 @@
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
-
-
-
-
                 <v-dialog v-model="donadoresDialog" max-width="500px">
                     <v-card>
                         <v-card-title class="text-h5">Donadores</v-card-title>
@@ -78,9 +71,6 @@
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
-
-
-
             </v-toolbar>
         </template>
         <template v-slot:item.donadores="{ item }">
@@ -88,7 +78,6 @@
                 Ver donadores
             </v-btn>
         </template>
-
         <template v-slot:item.actions="{ item }">
             <v-icon size="small" class="me-2" @click="editItem(item)">
                 mdi-pencil
@@ -104,7 +93,6 @@
 import { ref, reactive, watch, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
-import Barra from '@/components/Barra.vue'
 const headers = [
     { title: 'ID', sortable: true, key: 'id' },
     { title: 'Nombre', align: 'start', sortable: true, key: 'nombre' },
@@ -116,77 +104,12 @@ const headers = [
 
 const donadoresDialog = ref(false);
 const donadores = ref([]);
-
-const showDonadores = async (item) => {
-    // Lógica para obtener los donadores asociados al 'item'
-    // Supongamos que 'item.donadores' es un arreglo con los nombres de los donadores
-    const res = await axios.get(`https://localhost:3000/donadores/${item.id}/proyecto`, config);
-    const personasRes = await axios.get(`https://localhost:3000/personas`, config);
-
-    const donations = res.data;
-    const personas = personasRes.data;
-    console.log(personas);
-
-    const donadoresList = [];
-
-    donations.forEach((donador) => {
-
-        const personaRelacionada = personas.find((persona) => persona.id === donador.personaId);
-        // console.log(personaRelacionada);
-        donadoresList.push({
-            nombre: personaRelacionada.nombre,
-            donacion: donador.donacion
-        });
-    });
-    console.log(donadores);
-    donadores.value = donadoresList;
-    donadoresDialog.value = true;
-};
-
-const closeDonadoresDialog = () => {
-    // Cerrar la ventana emergente de donadores
-    donadoresDialog.value = false;
-    // Limpiar la lista de donadores cuando se cierre la ventana emergente
-    donadores.value = [];
-};
 const info = ref([]);
 const route = useRoute();
 const token = route.query.token;
 const config = {
     headers: { Authorization: `Bearer ${token}` }
 };
-
-const obtenerInfo = async () => {
-    const res = await axios.get('https://localhost:3000/proyectos', config);
-    const resp = await axios.get('https://localhost:3000/personas', config);
-    console.log(res.data);
-    console.log(resp.data);
-    const proyectos = res.data;
-    const personas = resp.data;
-
-    const personasMap = new Map();
-    personas.forEach(persona => {
-        personasMap.set(persona.id, persona.nombre);
-    });
-
-    const infoMerged = proyectos.map(proyecto => {
-        return {
-            ...proyecto,
-            donatario: personasMap.get(proyecto.donatarioId)
-        };
-    });
-
-    console.log(infoMerged);
-    info.value = infoMerged;
-}
-
-const initialize = async () => {
-    await obtenerInfo();
-}
-
-onMounted(() => {
-    initialize();
-});
 
 const dialog = ref(false);
 const dialogDelete = ref(false);
@@ -204,9 +127,62 @@ const defaultItem = {
     donatarioId: 0,
 };
 
+const showDonadores = async (item) => {
+    const res = await axios.get(`https://localhost:3000/donadores/${item.id}/proyecto`, config);
+    const personasRes = await axios.get(`https://localhost:3000/personas`, config);
+
+    const donations = res.data;
+    const personas = personasRes.data;
+
+    const donadoresList = [];
+
+    donations.forEach((donador) => {
+        const personaRelacionada = personas.find((persona) => persona.id === donador.personaId);
+        donadoresList.push({
+            nombre: personaRelacionada.nombre,
+            donacion: donador.donacion
+        });
+    });
+    donadores.value = donadoresList;
+    donadoresDialog.value = true;
+};
+
+const closeDonadoresDialog = () => {
+    donadoresDialog.value = false;
+    donadores.value = [];
+};
+
+const obtenerInfo = async () => {
+    const res = await axios.get('https://localhost:3000/proyectos', config);
+    const resp = await axios.get('https://localhost:3000/personas', config);
+    const proyectos = res.data;
+    const personas = resp.data;
+
+    const personasMap = new Map();
+    personas.forEach(persona => {
+        personasMap.set(persona.id, persona.nombre);
+    });
+
+    const infoMerged = proyectos.map(proyecto => {
+        return {
+            ...proyecto,
+            donatario: personasMap.get(proyecto.donatarioId)
+        };
+    });
+
+    info.value = infoMerged;
+}
+
+const initialize = async () => {
+    await obtenerInfo();
+}
+
+onMounted(() => {
+    initialize();
+});
+
 const editItem = async (item) => {
     try {
-        console.log(item);
         editedItem.id = item.id;
         editedItem.nombre = item.nombre;
         editedItem.descripcion = item.descripcion;
@@ -230,14 +206,10 @@ const save = async () => {
             descripcion: newItem.descripcion,
             donatarioId: newItem.donatarioId,
         };
-        console.log("Esto es lo que se envia a crear: ", proyecto);
         const res = await axios.post(`https://localhost:3000/proyectos/`, proyecto, config);
-        console.log(res);
         if (res.data.success == true) {
             const donatario = await axios.get(`https://localhost:3000/personas/`, config);
-            console.log(donatario);
             const donatarioName = donatario.data.find(persona => persona.id === parseInt(res.data.proyecto.donatarioId));
-            console.log(donatarioName);
             info.value.push({
                 id: res.data.proyecto.id,
                 nombre: editedItem.nombre,
@@ -262,15 +234,11 @@ const save = async () => {
             descripcion: editedDessert.descripcion,
             donatarioId: editedDessert.donatarioId,
         };
-        console.log("Este es el proyecto a editar: ", proyecto)
         try {
             const res = await axios.put(`https://localhost:3000/proyectos/${proyecto.id}`, proyecto, config);
-            console.log(res);
             if (res.data.success == true) {
                 const donatario = await axios.get(`https://localhost:3000/personas/`, config);
-                console.log(donatario);
                 const donatarioName = donatario.data.find(persona => persona.id === parseInt(res.data.proyecto.donatarioId));
-                console.log(donatarioName);
                 const index = editedIndex.value;
                 info.value[index] = {
                     id: editedItem.id,
@@ -305,9 +273,6 @@ watch(dialog, (val) => {
     val || close();
 });
 
-
-
-
 const deleteItem = (item) => {
     editedIndex.value = info.value.indexOf(item);
     editedItem.id = item.id;
@@ -333,6 +298,7 @@ const closeDelete = () => {
     editedItem.value = { ...defaultItem };
     editedIndex.value = -1;
 };
+
 watch(dialogDelete, (val) => {
     val || closeDelete();
 });

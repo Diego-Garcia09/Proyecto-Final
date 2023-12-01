@@ -1,5 +1,4 @@
 <template>
-    <!-- <Barra /> -->
     <v-data-table :headers="headers" :items="info" :sort-by="[{ key: 'id', order: 'asc' }]" class="elevation-1">
         <template v-slot:top>
             <v-toolbar flat>
@@ -19,9 +18,6 @@
                         <v-card-text>
                             <v-container>
                                 <v-row>
-                                    <!-- <v-col cols="12" sm="6" md="4">
-                                        <v-text-field v-model="editedItem.id" label="ID"></v-text-field>
-                                    </v-col> -->
                                     <v-col cols="12" sm="6" md="4">
                                         <v-text-field v-model="editedItem.nombre" label="Nombre"></v-text-field>
                                     </v-col>
@@ -45,8 +41,6 @@
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
-
-
                 <v-dialog v-model="dialogDelete" max-width="500px">
                     <v-card>
                         <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
@@ -58,8 +52,6 @@
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
-
-
             </v-toolbar>
         </template>
         <template v-slot:item.actions="{ item }">
@@ -77,7 +69,6 @@
 import { ref, reactive, watch, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
-import Barra from '@/components/Barra.vue'
 const headers = [
     { title: 'ID', sortable: true, key: 'id' },
     { title: 'Nombre', align: 'start', sortable: true, key: 'nombre' },
@@ -124,7 +115,6 @@ const defaultItem = {
 
 const editItem = async (item) => {
     try {
-        console.log(item);
         editedItem.id = item.id;
         editedItem.nombre = item.nombre;
         editedItem.email = item.email;
@@ -177,7 +167,6 @@ const save = async () => {
             email: editedDessert.email,
             rfc: editedDessert.rfc
         };
-        console.log("Esta es la persona a editar: ", persona)
         try {
             const res = await axios.put(`https://localhost:3000/personas/${persona.id}`, persona, config);
             console.log(res);

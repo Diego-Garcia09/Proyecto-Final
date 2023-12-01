@@ -78,21 +78,13 @@ const config = {
 const getProyectos = async () => {
     const res = await axios.get(`https://localhost:3000/proyectos/`, config);
     proyectos.value = res.data;
-    console.log(res);
 }
 
 const submitDonation = async () => {
-    console.log('Nombre Completo:', fullName.value);
-    console.log('RFC:', rfc.value);
-    console.log('Email:', email.value);
-    console.log('Monto a Donar:', amount.value);
-    console.log(proyectoDonar.value);
     const checkRFC = await axios.get(`https://localhost:3000/personas/rfc/${rfc.value}`, config);
     const checkEmail = await axios.get(`https://localhost:3000/personas/email/${email.value}`, config);
     const checkName = await axios.get(`https://localhost:3000/personas/nombre/${email.value}/${rfc.value}`, config);
-    console.log(checkName);
     if (checkRFC.data.length == 0 & checkEmail.data.length == 0) {
-        console.log("Creare a la persona");
         const donacion = {
             proyectoId: proyectoDonar.value,
             personaId: rfc.value,
@@ -100,12 +92,10 @@ const submitDonation = async () => {
         }
         const creacionPersona = await axios.post(`https://localhost:3000/personas/${fullName.value}/${email.value}/${rfc.value}`, config);
         const crearDonacion = await axios.post(`https://localhost:3000/donadores/`, donacion, config);
-        console.log(crearDonacion);
     }
     else {
         if (checkRFC.data.length !== 0 && checkEmail.data.length !== 0 && checkName.data[0].nombre == fullName.value) {
             const checkDonadoresExist = await axios.get(`https://localhost:3000/donadores/${checkRFC.data[0].id}/persona`, config);
-            console.log(checkDonadoresExist);
             const donacion = {
                 proyectoId: proyectoDonar.value,
                 personaId: rfc.value,
@@ -114,13 +104,9 @@ const submitDonation = async () => {
             if (checkDonadoresExist.data.length == 0) {
                 await axios.post(`https://localhost:3000/donadores/`, donacion, config);
             }
-            else
-            {
-                console.log("Se donará con esa persona existente.");
+            else {
                 const res = await axios.put(`https://localhost:3000/donadores/${proyectoDonar.value}`, donacion, config);
-                console.log(res);
             }
-            // Realizar la donación con la persona existente (código adicional necesario)
         } else {
             console.log("Algun campo ya existe");
         }
@@ -133,22 +119,20 @@ const submitDonation = async () => {
 };
 
 const cancelDonation = () => {
-    // Reiniciar los valores de los campos del formulario
     fullName.value = '';
     rfc.value = '';
     email.value = '';
     amount.value = 0;
-
-    // Cerrar el overlay
     showOverlay.value = false;
 };
 
 const showDonationOverlay = (projectId) => {
     showOverlay.value = true;
-    showDonationType.value = 'donacion1'; // O 'donacion2' dependiendo de tu lógica
+    showDonationType.value = 'donacion1';
     console.log(`Donando al proyecto con ID: ${projectId}`);
     proyectoDonar.value = projectId;
 };
+
 onMounted(() => {
     getProyectos();
 });

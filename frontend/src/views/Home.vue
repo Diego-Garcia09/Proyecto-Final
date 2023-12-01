@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-  import GoogleLogin from '@/components/GoogleLogin.vue'
+import GoogleLogin from '@/components/GoogleLogin.vue'
 </script>
